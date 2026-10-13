@@ -1,0 +1,2 @@
+# Recovery init for nubia V70 Design (Z2458) - ro.hardware=ums9230_6h10
+import /init.recovery.common.rc
