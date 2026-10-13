@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- Z2458 (720x1600) theme overrides, included after vars.xml. -->
+<recovery>
+	<variables>
+		<!-- Compact list rows so the six additions entries fit above the navbar. -->
+		<variable name="bl_h1" value="104" />
+		<!-- End the additions list where page content is clipped (navbar panel top).
+		     The old value ran past that line, so the list thought rows were
+		     visible that were not and could only scroll a few pixels. -->
+		<variable name="adv_additions_h" value="%nav_panel_y%-%row5_1_y%" />
+	</variables>
+</recovery>
