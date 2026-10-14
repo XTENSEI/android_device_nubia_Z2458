@@ -1,0 +1,6 @@
+# Device-specific recovery properties
+# (values from stock vendor_boot ramdisk prop.default)
+sys.usb.controller=musb-hdrc.0.auto
+ro.recovery.usb.vid=18D1
+ro.recovery.usb.adb.pid=D001
+ro.recovery.usb.fastboot.pid=4EE0
