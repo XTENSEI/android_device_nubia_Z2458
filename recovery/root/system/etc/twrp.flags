@@ -1,0 +1,69 @@
+# Flags for Z2458, extends /system/etc/recovery.fstab by mount point.
+# Mount points must be a single path segment: TWRP resolves a partition by the
+# first segment only, so a two segment point like /storage/sdcard0 is never
+# found. The card is /external_sd, with /storage/sdcard0 and /mnt/sdcard kept as
+# symlinks to it by init.recovery.common.rc.
+# /super is not declared: TWRP builds it from the logical volumes, a second
+# entry would list it twice in Install Image.
+# backup=1 puts a partition in the backup list, flashimg=1 in Install Image.
+
+## Bootloader / firmware
+/spl                 emmc   /dev/block/mmcblk0boot0              flags=display=spl;slotselect;backup=1;flashimg=1
+/spl_bk              emmc   /dev/block/mmcblk0boot1              flags=display=spl_bk;backup=1;flashimg=1
+/uboot               emmc   /dev/block/by-name/uboot             flags=display=uboot;slotselect;backup=1;flashimg=1
+/sml                 emmc   /dev/block/by-name/sml               flags=display=sml;slotselect;backup=1;flashimg=1
+/tos                 emmc   /dev/block/by-name/trustos           flags=display=tos;slotselect;backup=1;flashimg=1
+/teecfg              emmc   /dev/block/by-name/teecfg            flags=display=teecfg;slotselect;backup=1;flashimg=1
+/vbmeta              emmc   /dev/block/by-name/vbmeta            flags=display=vbmeta;slotselect;backup=1;flashimg=1
+/vbmeta_system       emmc   /dev/block/by-name/vbmeta_system     flags=display=vbmeta_system;slotselect;backup=1;flashimg=1
+/vbmeta_vendor       emmc   /dev/block/by-name/vbmeta_vendor     flags=display=vbmeta_vendor;slotselect;backup=1;flashimg=1
+/vbmeta_odm          emmc   /dev/block/by-name/vbmeta_odm        flags=display=vbmeta_odm;slotselect;backup=1;flashimg=1
+/vbmeta_product      emmc   /dev/block/by-name/vbmeta_product    flags=display=vbmeta_product;slotselect;backup=1;flashimg=1
+/vbmeta_system_ext   emmc   /dev/block/by-name/vbmeta_system_ext flags=display=vbmeta_system_ext;slotselect;backup=1;flashimg=1
+/dtbo                emmc   /dev/block/by-name/dtbo              flags=display=dtbo;slotselect;backup=1;flashimg=1
+/boot                emmc   /dev/block/by-name/boot              flags=display=boot;slotselect;backup=1;flashimg=1
+/init_boot           emmc   /dev/block/by-name/init_boot         flags=display=init_boot;slotselect;backup=1;flashimg=1
+/vendor_boot         emmc   /dev/block/by-name/vendor_boot       flags=display=vendor_boot;slotselect;backup=1;flashimg=1
+
+## Modem / DSP / NV
+/ltedsp              emmc   /dev/block/by-name/l_ldsp            flags=display=ltedsp;slotselect;backup=1;flashimg=1
+/ltegdsp             emmc   /dev/block/by-name/l_gdsp            flags=display=ltegdsp;slotselect;backup=1;flashimg=1
+/lteagdsp            emmc   /dev/block/by-name/l_agdsp           flags=display=lteagdsp;slotselect;backup=1;flashimg=1
+/ltecdsp             emmc   /dev/block/by-name/l_cdsp            flags=display=ltecdsp;slotselect;backup=1;flashimg=1
+/ltemodem            emmc   /dev/block/by-name/l_modem           flags=display=ltemodem;slotselect;backup=1;flashimg=1
+/ltefixnv1           emmc   /dev/block/by-name/l_fixnv1          flags=display=ltefixnv1;backup=1;flashimg=1
+/ltefixnv2           emmc   /dev/block/by-name/l_fixnv2          flags=display=ltefixnv2;backup=1;flashimg=1
+/ltedeltanv          emmc   /dev/block/by-name/l_deltanv         flags=display=ltedeltanv;slotselect;backup=1;flashimg=1
+/lteruntimenv1       emmc   /dev/block/by-name/l_runtimenv1      flags=display=lteruntimenv1;backup=1;flashimg=1
+/lteruntimenv2       emmc   /dev/block/by-name/l_runtimenv2      flags=display=lteruntimenv2;backup=1;flashimg=1
+/wcnmodem            emmc   /dev/block/by-name/wcnmodem          flags=display=wcnmodem;slotselect;backup=1;flashimg=1
+/gnssmodem           emmc   /dev/block/by-name/gnssmodem         flags=display=gnssmodem;slotselect;backup=1;flashimg=1
+/pmsys               emmc   /dev/block/by-name/pm_sys            flags=display=pmsys;slotselect;backup=1;flashimg=1
+
+## Boot control / identity
+/misc                emmc   /dev/block/by-name/misc              flags=display=misc;backup=1;flashimg=1
+/persist             emmc   /dev/block/by-name/persist           flags=display=persist;backup=1;flashimg=1
+/logo                emmc   /dev/block/by-name/logo              flags=display=logo;backup=1;flashimg=1
+/fbootlogo           emmc   /dev/block/by-name/fbootlogo         flags=display=fbootlogo;backup=1;flashimg=1
+/prodnv              emmc   /dev/block/by-name/prodnv            flags=display=prodnv;backup=1;flashimg=1
+/calinv              emmc   /dev/block/by-name/calinv            flags=display=calinv;backup=1;flashimg=1
+/ztecfg              emmc   /dev/block/by-name/ztecfg            flags=display=ztecfg;backup=1;flashimg=1
+/ztepersist          emmc   /dev/block/by-name/ztepersist        flags=display=ztepersist;backup=1;flashimg=1
+/miscdata            emmc   /dev/block/by-name/miscdata          flags=display=miscdata;backup=1;flashimg=1
+
+## Dynamic (super) logical partitions
+/system              erofs  system                               flags=display=system;logical;slotselect;backup=1;flashimg=1
+/system              ext4   system                               flags=display=system;logical;slotselect;backup=1;flashimg=1
+/system_ext          erofs  system_ext                           flags=display=system_ext;logical;slotselect;backup=1;flashimg=1
+/vendor              erofs  vendor                               flags=display=vendor;logical;slotselect;backup=1;flashimg=1
+/odm                 erofs  odm                                  flags=display=odm;logical;slotselect;backup=1;flashimg=1
+/product             erofs  product                              flags=display=product;logical;slotselect;backup=1;flashimg=1
+/vendor_dlkm         erofs  vendor_dlkm                          flags=display=vendor_dlkm;logical;slotselect;backup=1;flashimg=1
+/system_dlkm         erofs  system_dlkm                          flags=display=system_dlkm;logical;slotselect;backup=1;flashimg=1
+
+## Data / cache / external
+/metadata            f2fs   /dev/block/by-name/metadata          flags=display=metadata;backup=1;flashimg=1
+/metadata            ext4   /dev/block/by-name/metadata          flags=display=metadata;backup=1;flashimg=1
+/data                f2fs   /dev/block/by-name/userdata          flags=display=data;backup=1;flashimg=1
+/cache               ext4   /dev/block/by-name/cache             flags=display=cache;backup=1;flashimg=1
+/external_sd          vfat   /dev/block/mmcblk1p1                 flags=display="MicroSD";storage;wipeingui;removable
