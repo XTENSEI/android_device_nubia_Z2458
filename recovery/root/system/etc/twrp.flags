@@ -50,6 +50,7 @@
 /ztecfg              emmc   /dev/block/by-name/ztecfg            flags=display=ztecfg;backup=1;flashimg=1
 /ztepersist          emmc   /dev/block/by-name/ztepersist        flags=display=ztepersist;backup=1;flashimg=1
 /miscdata            emmc   /dev/block/by-name/miscdata          flags=display=miscdata;backup=1;flashimg=1
+/blackbox            emmc   /dev/block/by-name/blackbox           flags=display=blackbox;backup=1;flashimg=1
 
 ## Dynamic (super) logical partitions
 /system              erofs  system                               flags=display=system;logical;slotselect;backup=1;flashimg=1
