@@ -53,6 +53,10 @@ jobs:
         BRANCH: ${{ inputs.DEVICE_TREE_BRANCH }}
         URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
+        if [ -z "${TG_TOKEN}" ] || [ -z "${TG_CHAT}" ]; then
+          echo "::warning::TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is unset, notification skipped"
+          exit 0
+        fi
         MSG=$(printf '%s\n' \
           "⚙️ Build Started" \
           "📋 Workflow: OrangeFox Build" \
@@ -60,9 +64,10 @@ jobs:
           "🌿 Branch: ${BRANCH}" \
           "🔍 Watch on GitHub Actions (${URL})")
         ESCAPED=$(echo "$MSG" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
-        curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+        RESP=$(curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
           -H "Content-Type: application/json" \
-          -d "{\"chat_id\": \"${TG_CHAT}\", \"text\": ${ESCAPED}}"
+          -d "{\"chat_id\": \"${TG_CHAT}\", \"text\": ${ESCAPED}}")
+        echo "$RESP" | python3 -c "import sys,json; r=json.load(sys.stdin); print('telegram ok=%s %s' % (r.get('ok'), r.get('description',''))); sys.exit(0 if r.get('ok') else 1)"
 
     - name: Check Out
       uses: actions/checkout@v4
@@ -197,7 +202,7 @@ jobs:
         id: dtree_commit
         run: |
           REPO_PATH=$(echo "${{ inputs.DEVICE_TREE_URL }}" | sed 's|https://github.com/||' | sed 's|\.git$||')
-          SHA=$(git ls-remote "https://github.com/${REPO_PATH}" "refs/heads/${{ inputs.DEVICE_TREE_BRANCH }}" | head -1 | cut -f1)
+          SHA="${{ github.sha }}"
           SHORT_SHA=$(echo "$SHA" | cut -c1-7)
           COMMIT_URL="https://github.com/${REPO_PATH}/commit/${SHA}"
           COMMIT_MSG=$(curl -s "https://api.github.com/repos/${REPO_PATH}/commits/${SHA}" | python3 -c "import sys,json; c=json.load(sys.stdin); print(c.get('commit',{}).get('message','').split(chr(10))[0][:80])" 2>/dev/null || echo "")
@@ -244,6 +249,11 @@ jobs:
             "🔗 View Release on GitHub (${REL})" \
             "🪵 Full Workflow Log (${URL})")
           ESCAPED=$(echo "$MSG" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
-          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+          if [ -z "${TG_TOKEN}" ] || [ -z "${TG_CHAT}" ]; then
+            echo "::warning::TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is unset, notification skipped"
+            exit 0
+          fi
+          RESP=$(curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d "{\"chat_id\": \"${TG_CHAT}\", \"text\": ${ESCAPED}}"
+            -d "{\"chat_id\": \"${TG_CHAT}\", \"text\": ${ESCAPED}}")
+          echo "$RESP" | python3 -c "import sys,json; r=json.load(sys.stdin); print('telegram ok=%s %s' % (r.get('ok'), r.get('description',''))); sys.exit(0 if r.get('ok') else 1)"
