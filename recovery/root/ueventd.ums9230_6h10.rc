@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2016-2023 Unisoc (Shanghai) Technologies Co., Ltd
+# SPDX-License-Identifier: LicenseRef-Unisoc-General-1.0
+
+# Node ownership from the stock vendor ueventd, limited to the by-name entries
+# twrp.flags also declares.
+/dev/block/by-name/miscdata   0660    system    system
+/dev/block/by-name/persist    0660    system    system
+/dev/block/by-name/sysdumpdb  0660    system    system

@@ -1,2 +1,104 @@
-# Recovery init for nubia V70 Design (Z2458) - ro.hardware=ums9230_6h10
+# Recovery init for nubia V70 Design (Z2458), ro.hardware=ums9230_6h10.
+# Service user, group and argv below are copied from this device's own vendor
+# init rc files (vendor/vendor/vendor_a/etc/init/*.rc in the stock dump). Only
+# the start triggers differ: recovery never reaches early_hal, cali-start or
+# post-fs-data, so each service is disabled and started explicitly instead.
 import /init.recovery.common.rc
+
+# The TEE nodes appear only once TWRP has loaded TW_LOAD_VENDOR_MODULES.
+on fs
+    start prepdecrypt
+
+service prepdecrypt /system/bin/prepdecrypt.sh
+    oneshot
+    disabled
+    user root
+    group root
+    seclabel u:r:recovery:s0
+
+service keymint-2-0 /system/bin/android.hardware.security.keymint@2.0-unisoc.service.trusty
+    interface aidl android.hardware.security.keymint.IKeyMintDevice/default
+    user system
+    group system drmrpc
+    disabled
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64:/system/lib64/hw
+
+service gatekeeper-1-0 /system/bin/android.hardware.gatekeeper@1.0-service.trusty
+    interface hidl android.hardware.gatekeeper@1.0::IGatekeeper default
+    user system
+    group system
+    disabled
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64:/system/lib64/hw
+
+service vendor.sprd.boot-hal-1-2 /system/bin/vendor.sprd.hardware.boot@1.2-service
+    class hal
+    user root
+    group root
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64:/system/lib64/hw
+
+service vendor.tsupplicant /system/bin/tsupplicant firmware
+    user system
+    group system
+    disabled
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64:/system/lib64/hw
+
+service ta-supplier-wait /system/bin/start_tsupplicant.sh
+    oneshot
+    disabled
+    user root
+    group root
+    seclabel u:r:recovery:s0
+
+service storage-proxies /system/bin/start_storage_proxies.sh
+    oneshot
+    disabled
+    user root
+    group root
+    seclabel u:r:recovery:s0
+
+on property:crypto.ready=1
+    start keymint-2-0
+    start storage-proxies
+    start ta-supplier-wait
+
+on property:vendor.sprd.tsupplicant.enabled=1
+    start vendor.tsupplicant
+
+on property:twrp.tsupplicant.ready=1
+    start gatekeeper-1-0
+
+on property:ro.crypto.state=unsupported || property:ro.crypto.state=unencrypted || property:twrp.decrypt.done=true
+    stop keymint-2-0
+    stop gatekeeper-1-0
+
+# TEE secure storage proxies, argv from storageproxyd_android.rc. The gatekeeper
+# TA reads its failure records through these, and /data has to be mounted first.
+service vendor.rpmbproxy /system/bin/sprdstorageproxyd -f rpmb -d /dev/trusty-ipc-dev0 -p /data/vendor/sprd_ss
+    user root
+    group system
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64:/system/lib64/hw
+
+service vendor.nsproxy /system/bin/sprdstorageproxyd -f ns -d /dev/trusty-ipc-dev0 -p /data/vendor/sprd_ss
+    user root
+    group system
+    disabled
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64:/system/lib64/hw
+
+service vendor.prodproxy /system/bin/sprdstorageproxyd -f prodnv -d /dev/trusty-ipc-dev0 -p /mnt/vendor/productinfo/sprd_ss
+    user root
+    group system
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+    setenv LD_LIBRARY_PATH /system/lib64:/system/lib64/hw
+
+on boot
+    start health-hal-2-1
